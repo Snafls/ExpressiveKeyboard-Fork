@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+. В системную копию (и при переносе на новый телефон) попадают только словарь Т9
+  (выученные слова, пары слов, «Мой словарь») и настройки. Ключи API в настройках зашифрованы
+  ключом из Android Keystore, который не копируется, — на другом устройстве они просто пустые.
+  Шрифты, фоны, история буфера в файлах и кэш словарей не копируются.
+  Так словарь не пропадает при переустановке клавиатуры.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="sharedpref" path="expressive_keyboard_v8_data.xml" />
+        <include domain="sharedpref" path="expressive_keyboard_v7_prefs.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="expressive_keyboard_v8_data.xml" />
+        <include domain="sharedpref" path="expressive_keyboard_v7_prefs.xml" />
+    </device-transfer>
+</data-extraction-rules>

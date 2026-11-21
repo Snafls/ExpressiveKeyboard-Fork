@@ -1,0 +1,21 @@
+.gradle/
+build/
+app/build/
+local.properties
+app/src/main/assets/fonts/
+*.iml
+.idea/
+dist/
+.kotlin/
+
+# ключи подписи никогда не коммитим (signing/rotation.lineage — только публичные сертификаты, его можно)
+keystore/
+*.jks
+*.keystore
+
+# файлы ИИ-ассистентов — только локально, не в репозиторий
+CODEX.md
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.claude/

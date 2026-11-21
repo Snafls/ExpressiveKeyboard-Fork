@@ -1,5 +1,5 @@
 name: Android setup
-description: JDK 17, Gradle и встроенный шрифт Nunito — общая подготовка для всех сборок
+description: JDK 17, Gradle, Android NDK и встроенный шрифт Nunito
 
 runs:
   using: composite
@@ -15,7 +15,18 @@ runs:
 
     - name: Set up Android NDK
       shell: bash
-      run: sdkmanager "ndk;28.2.13676358"
+      run: |
+        SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+        SDKMANAGER=$(command -v sdkmanager || find "$SDK_ROOT" -name sdkmanager -type f 2>/dev/null | head -n 1 || true)
+        if [ -z "$SDKMANAGER" ]; then
+          mkdir -p "$SDK_ROOT/cmdline-tools"
+          curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o /tmp/cmdline-tools.zip
+          unzip -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools
+          mv /tmp/cmdline-tools/cmdline-tools "$SDK_ROOT/cmdline-tools/latest"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+        fi
+        yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null 2>&1 || true
+        "$SDKMANAGER" --sdk_root="$SDK_ROOT" "ndk;28.2.13676358"
 
     - name: Make gradlew executable
       shell: bash

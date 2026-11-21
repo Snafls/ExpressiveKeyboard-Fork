@@ -172,12 +172,12 @@ data class KeyboardSettings(
     val doubleSpacePeriod: Boolean = true,
     val hapticsEnabled: Boolean = true,
     val hapticMode: String = HapticMode.CUSTOM.id,
-    val vibrationMs: Float = 16f,
+    val vibrationMs: Float = 18f,
     val vibrationAmplitude: Float = 135f,
     val vibrateOnRelease: Boolean = false,
     val strongSpecialKeys: Boolean = true,
     val soundEnabled: Boolean = false,
-    val longPressMs: Float = 320f,
+    val longPressMs: Float = 300f,
     val enterHoldSend: Boolean = true,
     val enterHoldMs: Float = 550f,
     val flickSensitivity: Float = 0.5f,
@@ -246,7 +246,7 @@ data class KeyboardSettings(
     /** Пока есть подсказки слов, кнопки меню и микрофона прячутся — подсказкам вся ширина. */
     val suggestionsFullWidth: Boolean = false,
     val showEmojiKey: Boolean = true,
-    val showGlobeKey: Boolean = true,
+    val showGlobeKey: Boolean = false,
     val pressAnimation: Float = 1f,               // 0 = без анимации нажатия
     val panelAnimations: Boolean = true,
     /** Когда работает энергосбережение: SYSTEM — вместе с системой, ALWAYS — всегда, NEVER — никогда. */
@@ -271,7 +271,7 @@ data class KeyboardSettings(
     /** Свои анимации нажатия (JSON-массив). */
     val customAnims: String = "",
     // --- ввод ---
-    val spaceSwipe: String = "CURSOR",            // CURSOR | LANGUAGE | OFF
+    val spaceSwipe: String = "LANGUAGE",            // CURSOR | LANGUAGE | OFF
     /** Удержание кнопки языка: LANGUAGES | SYSTEM | EMOJI | CLIPBOARD | VOICE | SETTINGS | ONE_HANDED | OFF */
     val globeLongPress: String = "LANGUAGES",
     /** Панель редактирования над клавиатурой: курсор, выделение, копировать/вставить. */
@@ -517,7 +517,7 @@ object KeyboardPrefs {
             // до 96 dp — для планшетов (на телефоне ползунок доходит до 68)
             keyHeightDp = p.getFloat("key_height_dp", 54f).coerceIn(32f, 96f),
             headerHeightDp = p.getFloat("header_height_dp", 48f).coerceIn(40f, 60f),
-            cornerRadiusDp = p.getFloat("corner_radius_dp", 16f).coerceIn(6f, 30f),
+            cornerRadiusDp = p.getFloat("corner_radius_dp", 16f).coerceIn(0f, 30f),
             keySpacingDp = p.getFloat("key_spacing_dp", 5f).coerceIn(2f, 8f),
             rowSpacingDp = p.getFloat("row_spacing_dp", 8f).coerceIn(2f, 12f),
             bottomOffsetDp = p.getFloat("bottom_offset_dp", DEFAULT_BOTTOM_OFFSET_DP).coerceIn(BOTTOM_OFFSET_RANGE),
@@ -533,12 +533,12 @@ object KeyboardPrefs {
             doubleSpacePeriod = p.getBoolean("double_space_period", true),
             hapticsEnabled = p.getBoolean("haptics_enabled", true),
             hapticMode = p.getString("haptic_mode", HapticMode.CUSTOM.id) ?: HapticMode.CUSTOM.id,
-            vibrationMs = p.getFloat("vibration_ms", 16f).coerceIn(1f, 80f),
+            vibrationMs = p.getFloat("vibration_ms", 18f).coerceIn(1f, 100f),
             vibrationAmplitude = p.getFloat("vibration_amplitude", 135f).coerceIn(1f, 255f),
             vibrateOnRelease = p.getBoolean("vibrate_on_release", false),
             strongSpecialKeys = p.getBoolean("strong_special_keys", true),
             soundEnabled = p.getBoolean("sound_enabled", false),
-            longPressMs = p.getFloat("long_press_ms", 320f).coerceIn(180f, 700f),
+            longPressMs = p.getFloat("long_press_ms", 300f).coerceIn(150f, 800f),
             enterHoldSend = p.getBoolean("enter_hold_send", true),
             enterHoldMs = p.getFloat("enter_hold_ms", 550f).coerceIn(300f, 1500f),
             flickSensitivity = p.getFloat("flick_sensitivity", 0.5f).coerceIn(0f, 1f),
@@ -554,11 +554,11 @@ object KeyboardPrefs {
             colorFuncText = p.getInt("color_func_text", 0),
             colorAccent = p.getInt("color_accent", 0),
             colorAccentText = p.getInt("color_accent_text", 0),
-            keyOpacity = p.getFloat("key_opacity", 1f).coerceIn(0.2f, 1f),
+            keyOpacity = p.getFloat("key_opacity", 1f).coerceIn(0f, 1f),
             keyBackground = p.getBoolean("key_background", true),
             bgTransparency = p.getFloat("bg_transparency", 0f).coerceIn(0f, 1f),
             bgImageVersion = p.getLong("bg_image_version", 0L),
-            bgDim = p.getFloat("bg_dim", 0.35f).coerceIn(0f, 0.9f),
+            bgDim = p.getFloat("bg_dim", 0.35f).coerceIn(0f, 0.95f),
             photoFrame = PhotoFrame(
                 mode = PhotoFit.entries.firstOrNull { it.name == p.getString("photo_fit", "COVER") } ?: PhotoFit.COVER,
                 zoom = p.getFloat("photo_zoom", 1f).coerceIn(0.5f, 3f),
@@ -593,7 +593,7 @@ object KeyboardPrefs {
             keyVariants = (p.getString(UserVariants.PREF, "") ?: "").also { UserVariants.update(it) },
             suggestionsFullWidth = p.getBoolean("suggestions_full_width", false),
             showEmojiKey = p.getBoolean("show_emoji_key", true),
-            showGlobeKey = p.getBoolean("show_globe_key", true),
+            showGlobeKey = p.getBoolean("show_globe_key", false),
             pressAnimation = p.getFloat("press_animation", 1f).coerceIn(0f, 2f),
             panelAnimations = p.getBoolean("panel_animations", true),
             ecoWhen = p.getString("eco_when", null) ?: if (p.getBoolean("eco_mode", true)) "SYSTEM" else "NEVER",
@@ -610,7 +610,7 @@ object KeyboardPrefs {
             animPopup = p.getString("anim_popup", "POP") ?: "POP",
             animPanel = p.getString("anim_panel", "SCALE") ?: "SCALE",
             customAnims = p.getString("custom_anims", "") ?: "",
-            spaceSwipe = p.getString("space_swipe", "CURSOR") ?: "CURSOR",
+            spaceSwipe = p.getString("space_swipe", "LANGUAGE") ?: "LANGUAGE",
             globeLongPress = p.getString("globe_long_press", "LANGUAGES") ?: "LANGUAGES",
             editBar = p.getBoolean("edit_bar", false),
             toolsLongPress = p.getString("tools_long_press", "PIN") ?: "PIN",

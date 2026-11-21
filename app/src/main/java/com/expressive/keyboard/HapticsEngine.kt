@@ -171,7 +171,18 @@ object HapticsEngine {
     }
 
     private fun play(v: Vibrator, effect: VibrationEffect) {
-        worker.post { runCatching { v.vibrate(effect) } }
+        worker.post {
+            runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val attrs = android.os.VibrationAttributes.Builder()
+                        .setUsage(android.os.VibrationAttributes.USAGE_TOUCH)
+                        .build()
+                    v.vibrate(effect, attrs)
+                } else {
+                    v.vibrate(effect)
+                }
+            }
+        }
     }
 
     // ---------------------------------------------------------------- свой звук нажатия

@@ -18,20 +18,22 @@ enum class KeySoundStyle(val id: String, val title: String) {
     BUBBLE("BUBBLE", "Пузырёк"),
     WOOD("WOOD", "Дерево"),
     MECHANICAL("MECHANICAL", "Механика"),
+    THOCK("THOCK", "Thock"),
+    CREAMY("CREAMY", "Creamy"),
     GLASS("GLASS", "Стекло"),
     CUSTOM("CUSTOM", "Свой файл");
 
     companion object {
         fun fromId(id: String?) = entries.firstOrNull { it.id == id } ?: SYSTEM
         /** Синтезированные — то, что можно выбрать без файла. */
-        val synthesized = listOf(SOFT, BUBBLE, WOOD, MECHANICAL, GLASS)
+        val synthesized = listOf(SOFT, BUBBLE, WOOD, MECHANICAL, THOCK, CREAMY, GLASS)
     }
 }
 
 object KeySounds {
     private const val RATE = 44_100
     /** Меняется, если поменялись формулы звуков: старые файлы в cache перезаписываются. */
-    private const val VERSION = 1
+    private const val VERSION = 2
 
     /** Файлы звука: [0] — буквы, [1] — пробел, Enter, ⌫. Создаются при первом обращении. */
     fun files(context: Context, style: KeySoundStyle): List<File>? {
@@ -51,6 +53,8 @@ object KeySounds {
             KeySoundStyle.BUBBLE -> 70
             KeySoundStyle.WOOD -> 90
             KeySoundStyle.MECHANICAL -> 70
+            KeySoundStyle.THOCK -> 48
+            KeySoundStyle.CREAMY -> 40
             KeySoundStyle.GLASS -> 160
             else -> 40
         } * (if (special) 1.2f else 1f)
@@ -99,6 +103,21 @@ object KeySounds {
                         (sin(2 * PI * f * t2).toFloat() * 0.7f + 0.35f * lp2) * exp(-t2 / 0.012f)
                     }
                     1.3f * click + thock
+                }
+                KeySoundStyle.THOCK -> {
+                    val f = (155f - 45f * min(1f, t * 25f)) * pitch
+                    phase += 2 * PI * f / RATE
+                    val noise = rnd.nextFloat() * 2f - 1f
+                    lp += 0.12f * (noise - lp)
+                    sin(phase).toFloat() * exp(-t / 0.011f) * 0.85f +
+                        sin(2 * PI * 920.0 * pitch * t).toFloat() * exp(-t / 0.0024f) * 0.3f +
+                        lp * exp(-t / 0.004f) * 0.25f
+                }
+                KeySoundStyle.CREAMY -> {
+                    val f = (310f - 90f * min(1f, t * 20f)) * pitch
+                    phase += 2 * PI * f / RATE
+                    sin(phase).toFloat() * exp(-t / 0.007f) * 0.82f +
+                        sin(2 * PI * 1350.0 * pitch * t).toFloat() * exp(-t / 0.0028f) * 0.3f
                 }
                 // лёгкий стеклянный «дзынь»: два чистых тона с мягкой атакой
                 KeySoundStyle.GLASS -> {
